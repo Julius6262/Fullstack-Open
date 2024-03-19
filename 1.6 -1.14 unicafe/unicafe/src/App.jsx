@@ -18,15 +18,25 @@ const Statistics = (props) => {
 };
 
 const Display = (props) => {
-  return (
-    <div>
-      <p>Good: {props.goodCount}</p>
-      <p>Neutral: {props.neutralCount}</p>
-      <p>Bad: {props.badCount}</p>
-      {/* Could also call  Statistics here, so Display displayed all values*/}
-    </div>
-  );
+  let total = props.goodCount + props.neutralCount + props.badCount //tried passing total from statistic without succes
+  if (total > 0) {
+    return (
+      <div>
+        <p>Good: {props.goodCount}</p>
+        <p>Neutral: {props.neutralCount}</p>
+        <p>Bad: {props.badCount}</p>
+        <Statistics goodCount={props.goodCount} neutralCount={props.neutralCount} badCount={props.badCount} />
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <p>No feedback given</p>
+      </div>
+    );
+  }
 };
+
 
 const Button = (props) => (
   <button onClick={props.handleClick}>
@@ -62,8 +72,7 @@ const App = () => {
       <Button handleClick={() => setToBadCount(badCount + 1)} text="Bad" />
       <h2>Statistics</h2>
       <Display goodCount={goodCount} neutralCount={neutralCount} badCount={badCount} />
-      <Statistics goodCount={goodCount} neutralCount={neutralCount} badCount={badCount} />
-
+      
     </div>
   );
 };
