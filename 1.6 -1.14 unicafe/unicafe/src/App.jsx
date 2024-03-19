@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-// make arrow function to calculate average
 
 
 
+// make arrow function to calculate total,average and positive procent
 
-const Calculate = (props) => {
+const Statistics = (props) => {
   let total = props.goodCount + props.neutralCount + props.badCount
   let average = (props.goodCount * 1 + props.neutralCount * 0 + props.badCount * -1) / total;
   let positiveProcent = (props.goodCount/total) * 100
@@ -23,11 +23,7 @@ const Display = (props) => {
       <p>Good: {props.goodCount}</p>
       <p>Neutral: {props.neutralCount}</p>
       <p>Bad: {props.badCount}</p>
-      <Calculate
-        goodCount={props.goodCount}
-        neutralCount={props.neutralCount}
-        badCount={props.badCount}
-      />
+      {/* Could also call  Statistics here, so Display displayed all values*/}
     </div>
   );
 };
@@ -66,6 +62,7 @@ const App = () => {
       <Button handleClick={() => setToBadCount(badCount + 1)} text="Bad" />
       <h2>Statistics</h2>
       <Display goodCount={goodCount} neutralCount={neutralCount} badCount={badCount} />
+      <Statistics goodCount={goodCount} neutralCount={neutralCount} badCount={badCount} />
 
     </div>
   );
