@@ -1,3 +1,11 @@
+# Exercise solution
+
+The solution to the exercises is in the folder "src". File "App.jsx" and "Main.jsx"  have been edited accordingly to answer the exercises. 
+
+
+
+
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
