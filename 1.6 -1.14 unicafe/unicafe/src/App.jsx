@@ -31,6 +31,25 @@ const Vote = ({selected, votes}) => {
   );
 };
 
+const MostVoteAnecdote = ({votes, anecdotes}) => {
+  const maxVotes = votes.indexOf(Math.max(...votes));  //spread the index of the array. And get the index of the biggest value
+  if (votes[maxVotes] > 0){
+      return(
+        <div>
+          {anecdotes[maxVotes]}
+        </div>
+      )
+    }
+  else {
+    return(
+    <div>
+      No votes yet
+    </div>
+    )
+  }
+};
+
+
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often.',
@@ -56,14 +75,12 @@ const App = () => {
   const handleSelectedClick = () => {
     const randomIndex = Math.floor(Math.random() * anecdotes.length);
     setSelected(randomIndex);
-    console.log("This is randomindex" + Math.floor(Math.random() * (anecdotes.length + 1)))  // we round down, so to include the full lenght of the array we add 1
   };
 const handleVoteClick = () => {
   const copy = [...votes];
   copy[selected] += 1
   setVotes(copy)
-  console.log(votes)
-};
+  };
 
   const total = goodCount + neutralCount + badCount;
   const average = (goodCount * 1 + neutralCount * 0 + badCount * -1) / total;
@@ -77,44 +94,48 @@ const handleVoteClick = () => {
       <Button handleClick={handleBadClick} text="Bad" />
       <br></br>
       <br></br>
+      <h1>Statistics</h1>
+      {total > 0 ? (
+        <table>
+          <tbody>
+            <tr>
+              <td>Good:</td>
+              <td><StatisticLine value={goodCount} /></td>
+            </tr>
+            <tr>
+              <td>Neutral:</td>
+              <td><StatisticLine value={neutralCount} /></td>
+            </tr>
+            <tr>
+              <td>Bad:</td>
+              <td><StatisticLine value={badCount} /></td>
+            </tr>
+            <tr>
+              <td>Total:</td>
+              <td><StatisticLine value={total} /></td>
+            </tr>
+            <tr>
+              <td>Average:</td>
+              <td><StatisticLine value={average.toFixed(1)} /></td>
+            </tr>
+            <tr>
+              <td>Positive :</td>
+              <td><StatisticLine value={`${positivePercent.toFixed(1)}%`} /></td>
+            </tr>
+          </tbody>
+        </table>
+      ) : (
+        <p>No feedback given</p>
+      )}
+      <h1>Anecdote of the day</h1>
       <Button handleClick={handleSelectedClick} text="next anecdote" />
       <Button handleClick={handleVoteClick} text = "vote" />
       <RandomAnecdotes anecdotes={anecdotes} selected={selected}/>
-      <Vote selected={selected} votes={votes}/>
-      <h2>Statistics</h2>
-    {total > 0 ? (
-      <table>
-        <tbody>
-          <tr>
-            <td>Good:</td>
-            <td><StatisticLine value={goodCount} /></td>
-          </tr>
-          <tr>
-            <td>Neutral:</td>
-            <td><StatisticLine value={neutralCount} /></td>
-          </tr>
-          <tr>
-            <td>Bad:</td>
-            <td><StatisticLine value={badCount} /></td>
-          </tr>
-          <tr>
-            <td>Total:</td>
-            <td><StatisticLine value={total} /></td>
-          </tr>
-          <tr>
-            <td>Average:</td>
-            <td><StatisticLine value={average.toFixed(1)} /></td>
-          </tr>
-          <tr>
-            <td>Positive :</td>
-            <td><StatisticLine value={`${positivePercent.toFixed(1)}%`} /></td>
-          </tr>
-        </tbody>
-      </table>
-    ) : (
-      <p>No feedback given</p>
-    )}
-  </div>
-);
+      <Vote votes={votes} selected={selected}/>
+      <h1>Anecdote with most votes</h1>
+      <MostVoteAnecdote votes = {votes} anecdotes={anecdotes}/>
+    </div>
+  );
+  
 };
 export default App;
