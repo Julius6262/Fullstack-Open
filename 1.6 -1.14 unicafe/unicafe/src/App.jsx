@@ -1,47 +1,15 @@
 import React, { useState } from 'react';
 
+// Button component for feedback submission
+const Button = ({ handleClick, text }) => (
+  <button onClick={handleClick}>{text}</button>
+);
 
-
-// make arrow function to calculate total,average and positive procent
-
-const Statistics = (props) => {
-  let total = props.goodCount + props.neutralCount + props.badCount
-  let average = (props.goodCount * 1 + props.neutralCount * 0 + props.badCount * -1) / total;
-  let positiveProcent = (props.goodCount/total) * 100
-  return(
- <div>
-  <p>total {total}</p>
-  <p>average {average} </p>
-  <p>positive {positiveProcent} %</p>
-  </div>
-  );
-};
-
-const Display = (props) => {
-  let total = props.goodCount + props.neutralCount + props.badCount //tried passing total from statistic without succes
-  if (total > 0) {
-    return (
-      <div>
-        <p>Good: {props.goodCount}</p>
-        <p>Neutral: {props.neutralCount}</p>
-        <p>Bad: {props.badCount}</p>
-        <Statistics goodCount={props.goodCount} neutralCount={props.neutralCount} badCount={props.badCount} />
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <p>No feedback given</p>
-      </div>
-    );
-  }
-};
-
-
-const Button = (props) => (
-  <button onClick={props.handleClick}>
-    {props.text}
-  </button>
+// StatisticLine component for displaying a single statistic
+const StatisticLine = ({ label, value }) => (
+  <p>
+    {label}: {value}
+  </p>
 );
 
 const App = () => {
@@ -49,33 +17,38 @@ const App = () => {
   const [neutralCount, setNeutralCount] = useState(0);
   const [badCount, setBadCount] = useState(0);
 
-  const setToGoodCount = (newGoodCount) => {
-    console.log('Good count now', newGoodCount);
-    setGoodCount(newGoodCount);
-  };
+  const handleGoodClick = () => setGoodCount(goodCount + 1);
+  const handleNeutralClick = () => setNeutralCount(neutralCount + 1);
+  const handleBadClick = () => setBadCount(badCount + 1);
 
-  const setToNeutralCount = (newNeutralCount) => {
-    console.log('Neutral count now', newNeutralCount);
-    setNeutralCount(newNeutralCount);
-  };
-
-  const setToBadCount = (newBadCount) => {
-    console.log('Bad count now', newBadCount);
-    setBadCount(newBadCount);
-  };
+  const total = goodCount + neutralCount + badCount;
+  const average = (goodCount * 1 + neutralCount * 0 + badCount * -1) / total;
+  const positivePercent = (goodCount / total) * 100;
 
   return (
     <div>
       <h1>Give feedback</h1>
-      <Button handleClick={() => setToGoodCount(goodCount + 1)} text="Good" />
-      <Button handleClick={() => setToNeutralCount(neutralCount + 1)} text="Neutral" />
-      <Button handleClick={() => setToBadCount(badCount + 1)} text="Bad" />
+      <Button handleClick={handleGoodClick} text="Good" />
+      <Button handleClick={handleNeutralClick} text="Neutral" />
+      <Button handleClick={handleBadClick} text="Bad" />
+
       <h2>Statistics</h2>
-      <Display goodCount={goodCount} neutralCount={neutralCount} badCount={badCount} />
-      
+      {total > 0 ? (
+        <div>
+          <StatisticLine label="Good" value={goodCount} />
+          <StatisticLine label="Neutral" value={neutralCount} />
+          <StatisticLine label="Bad" value={badCount} />
+          <StatisticLine label="Total" value={total} />
+          <StatisticLine label="Average" value={average} />
+          <StatisticLine label="Positive " value={`${positivePercent}%`} />
+        </div>
+      ) : (
+        <p>No feedback given</p>
+      )}
     </div>
   );
 };
 
 export default App;
+
 
