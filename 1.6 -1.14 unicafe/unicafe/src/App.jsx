@@ -8,7 +8,7 @@ const Button = ({ handleClick, text }) => (
 // StatisticLine component for displaying a single statistic
 const StatisticLine = ({ label, value }) => (
   <p>
-    {label}: {value}
+    {label} {value}
   </p>
 );
 
@@ -33,22 +33,39 @@ const App = () => {
       <Button handleClick={handleBadClick} text="Bad" />
 
       <h2>Statistics</h2>
-      {total > 0 ? (
-        <div>
-          <StatisticLine label="Good" value={goodCount} />
-          <StatisticLine label="Neutral" value={neutralCount} />
-          <StatisticLine label="Bad" value={badCount} />
-          <StatisticLine label="Total" value={total} />
-          <StatisticLine label="Average" value={average} />
-          <StatisticLine label="Positive " value={`${positivePercent}%`} />
-        </div>
-      ) : (
-        <p>No feedback given</p>
-      )}
-    </div>
-  );
+    {total > 0 ? (
+      <table>
+        <tbody>
+          <tr>
+            <td>Good:</td>
+            <td><StatisticLine value={goodCount} /></td>
+          </tr>
+          <tr>
+            <td>Neutral:</td>
+            <td><StatisticLine value={neutralCount} /></td>
+          </tr>
+          <tr>
+            <td>Bad:</td>
+            <td><StatisticLine value={badCount} /></td>
+          </tr>
+          <tr>
+            <td>Total:</td>
+            <td><StatisticLine value={total} /></td>
+          </tr>
+          <tr>
+            <td>Average:</td>
+            <td><StatisticLine value={average.toFixed(1)} /></td>
+          </tr>
+          <tr>
+            <td>Positive :</td>
+            <td><StatisticLine value={`${positivePercent.toFixed(1)}%`} /></td>
+          </tr>
+        </tbody>
+      </table>
+    ) : (
+      <p>No feedback given</p>
+    )}
+  </div>
+);
 };
-
 export default App;
-
-
