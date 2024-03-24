@@ -2,6 +2,9 @@
 import React from 'react';
 
 const Course = ({ course }) => {
+  // Calculate total exercises using reduce
+  const totalExercises = course.parts.reduce((total, part) => total + part.exercises, 0);
+
   return (
     <div>
       <h1>{course.name}</h1>
@@ -12,6 +15,8 @@ const Course = ({ course }) => {
           </li>
         ))}
       </ul>
+      {/* Render total exercises separately */}
+      <p><strong>Total of {totalExercises} exercises</strong></p>
     </div>
   );
 };
