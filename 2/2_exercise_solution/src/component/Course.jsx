@@ -1,4 +1,4 @@
-// Course.js
+// Course.jsx component
 import React from 'react';
 
 const Course = ({ course }) => {
