@@ -3,12 +3,12 @@ import { useState } from 'react'
 const App = () => {
   // Initialize state variables using the useState hook
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas',
-     number: '040-1234567' }
+    { name: 'Arto Hellas', number: '040-1234567', id: 1 }
   ]) 
+
   const [newName, setNewName] = useState('')
-  
   const [newNumber, setNewNumber] = useState('')
+  const [newSearchWord, setNewSearchWord] = useState('')
 
   // Handler called onChange is being called in input text field
   const handleInputChangeName = (event) => {
@@ -26,6 +26,14 @@ const App = () => {
       setNewNumber(event.target.value)
     }
 
+   // Handler called onChange is being called in input text field
+   const handleInputChangeSearchWord = (event) => {
+    // Log each change i typing
+    console.log(event.target.value)
+    // Update newName to the text within the textfield of input. newName can then be used in handle submit 
+    setNewSearchWord(event.target.value)
+  }
+
   // Event handler when the onSubmit is being clicked. 
   const handleSubmit = (event) => {
     // Prevent the default form submission behavior, which would cause a page reload
@@ -39,14 +47,18 @@ const App = () => {
     setNewNumber('');
     return; // Exit the function early
   }
+    // create number for id, 1 is hardcodede so we start at 2, the id increases as the length of the array increases
+    let i = persons.length +1
     // If the name doesn't exist, proceed to add it
     // Create a new person, on the same format as the persons in the hook, by adding name and number
-    const newPerson = {name: newName, number: newNumber}
+    const newPerson = {name: newName, number: newNumber, id: i}
     // Sets person to the new array, with the new person at the end
     setPersons(persons.concat(newPerson));  // Sets person to the new array, with the new person at the end
     // clear the input field
     setNewName('');
-    setNewNumber('');  
+    setNewNumber('');
+    
+    console.log(persons)  
   }
 
   const doesExist = () => {
@@ -58,9 +70,16 @@ const App = () => {
     return false;
   }
 
+
+  const filteredPerson = persons.filter((person) => {
+    return person.name.toLowerCase().includes(newSearchWord.toLowerCase());
+  });
+  
   return (
     <div>
       <h2>Phonebook</h2>
+      filter shown with <input value={newSearchWord} onChange={handleInputChangeSearchWord} />
+      <h2>Add a new</h2>
       {/* collet user input i form */}
       <form onSubmit={handleSubmit}>
       {/*input field, the typed value is being saved in newName.  */}
@@ -75,10 +94,19 @@ const App = () => {
       <h2>Numbers</h2>
 
       <ul>
-        {persons.map(person => (
-          <li key={person.name}>{person.name} {person.number}</li>
-        ))}
-      </ul>
+  {/* Check if there's a search filter and if the filter is applied */}
+  {newSearchWord === '' ? (
+    // If no filter is applied, display all persons
+    persons.map(person => (
+      <li key={person.id}>{person.name} {person.number}</li>
+    ))
+  ) : (
+    // If a filter is applied, display filtered persons only
+    filteredPerson.map(person => (
+      <li key={person.id}>{person.name} {person.number}</li>
+    ))
+  )}
+</ul>
       </div>
   );
 };
