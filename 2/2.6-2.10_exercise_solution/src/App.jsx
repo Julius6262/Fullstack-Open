@@ -3,18 +3,28 @@ import { useState } from 'react'
 const App = () => {
   // Initialize state variables using the useState hook
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
+    { name: 'Arto Hellas',
+     number: '040-1234567' }
   ]) 
   const [newName, setNewName] = useState('')
-
+  
+  const [newNumber, setNewNumber] = useState('')
 
   // Handler called onChange is being called in input text field
-  const handleInputChange = (event) => {
+  const handleInputChangeName = (event) => {
     // Log each change i typing
     console.log(event.target.value)
     // Update newName to the text within the textfield of input. newName can then be used in handle submit 
     setNewName(event.target.value)
   }
+
+    // Handler called onChange is being called in input text field
+    const handleInputChangeNumber = (event) => {
+      // Log each change i typing
+      console.log(event.target.value)
+      // Update newName to the text within the textfield of input. newName can then be used in handle submit 
+      setNewNumber(event.target.value)
+    }
 
   // Event handler when the onSubmit is being clicked. 
   const handleSubmit = (event) => {
@@ -26,15 +36,17 @@ const App = () => {
       window.alert(`${newName} is already added to phonebook`);
     // Reset the input field
     setNewName('');
+    setNewNumber('');
     return; // Exit the function early
   }
     // If the name doesn't exist, proceed to add it
-    // Create a new person, on the same format as the persons in the hook, by adding it to the end
-    const newPerson = {name: newName}
+    // Create a new person, on the same format as the persons in the hook, by adding name and number
+    const newPerson = {name: newName, number: newNumber}
     // Sets person to the new array, with the new person at the end
     setPersons(persons.concat(newPerson));  // Sets person to the new array, with the new person at the end
     // clear the input field
-    setNewName('');  
+    setNewName('');
+    setNewNumber('');  
   }
 
   const doesExist = () => {
@@ -52,16 +64,19 @@ const App = () => {
       {/* collet user input i form */}
       <form onSubmit={handleSubmit}>
       {/*input field, the typed value is being saved in newName.  */}
-      name: <input value={newName} onChange={handleInputChange} />
+      name: <input value={newName} onChange={handleInputChangeName} />
+      <br></br>
+      
+      number: <input value={newNumber} onChange={handleInputChangeNumber}/>
       {/* create a button of typesubmit, wich goes with OnSubmit */}
+      <br></br>
       <button type="submit">add</button>
       </form>
       <h2>Numbers</h2>
-      <br></br>
-      <h2>Names :</h2>
+
       <ul>
         {persons.map(person => (
-          <li key={person.name}>{person.name}</li>
+          <li key={person.name}>{person.name} {person.number}</li>
         ))}
       </ul>
       </div>
