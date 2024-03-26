@@ -7,6 +7,7 @@ const App = () => {
   ]) 
   const [newName, setNewName] = useState('')
 
+
   // Handler called onChange is being called in input text field
   const handleInputChange = (event) => {
     // Log each change i typing
@@ -19,25 +20,41 @@ const App = () => {
   const handleSubmit = (event) => {
     // Prevent the default form submission behavior, which would cause a page reload
     event.preventDefault(); 
+    
+    if (doesExist()){
+      // Name already exists, handle accordingly and show error message
+      window.alert(`${newName} is already added to phonebook`);
+    // Reset the input field
+    setNewName('');
+    return; // Exit the function early
+  }
+    // If the name doesn't exist, proceed to add it
     // Create a new person, on the same format as the persons in the hook, by adding it to the end
     const newPerson = {name: newName}
     // Sets person to the new array, with the new person at the end
     setPersons(persons.concat(newPerson));  // Sets person to the new array, with the new person at the end
     // clear the input field
-    setNewName('');
-    
+    setNewName('');  
+  }
+
+  const doesExist = () => {
+    for ( let i= 0; i < persons.length; i++){
+      if (JSON.stringify(persons[i].name) === (JSON.stringify(newName))){
+        return true;
+      }
+    }
+    return false;
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      {/* collet user input i form */}
       <form onSubmit={handleSubmit}>
-        <div>
-          name: <input value={newName} onChange={handleInputChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
+      {/*input field, the typed value is being saved in newName.  */}
+      name: <input value={newName} onChange={handleInputChange} />
+      {/* create a button of typesubmit, wich goes with OnSubmit */}
+      <button type="submit">add</button>
       </form>
       <h2>Numbers</h2>
       <br></br>
@@ -47,9 +64,8 @@ const App = () => {
           <li key={person.name}>{person.name}</li>
         ))}
       </ul>
-    </div>
-  )  
-}
-
+      </div>
+  );
+};
 export default App
 
