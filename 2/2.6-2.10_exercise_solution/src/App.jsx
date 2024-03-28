@@ -1,4 +1,15 @@
 import { useState } from 'react'
+import filterPersons from './components/filterPersons';
+import doesExist from './components/doesExist';
+import addPerson from './components/addPerson';
+
+const renderPersons = (newSearchWord, persons) => {
+  const personsToRender = newSearchWord === '' ? persons : filterPersons(persons, newSearchWord);
+  return personsToRender.map((person) => (
+    <li key={person.id}>{person.name} {person.number}</li>
+  ));
+};
+
 
 const App = () => {
   // Initialize state variables using the useState hook
@@ -39,7 +50,7 @@ const App = () => {
     // Prevent the default form submission behavior, which would cause a page reload
     event.preventDefault(); 
     
-    if (doesExist()){
+    if (doesExist(persons, newName)){
       // Name already exists, handle accordingly and show error message
       window.alert(`${newName} is already added to phonebook`);
     // Reset the input field
@@ -47,67 +58,37 @@ const App = () => {
     setNewNumber('');
     return; // Exit the function early
   }
-    // create number for id, 1 is hardcodede so we start at 2, the id increases as the length of the array increases
-    let i = persons.length +1
-    // If the name doesn't exist, proceed to add it
-    // Create a new person, on the same format as the persons in the hook, by adding name and number
-    const newPerson = {name: newName, number: newNumber, id: i}
-    // Sets person to the new array, with the new person at the end
-    setPersons(persons.concat(newPerson));  // Sets person to the new array, with the new person at the end
-    // clear the input field
-    setNewName('');
-    setNewNumber('');
-    
-    console.log(persons)  
+    addPerson(persons, newName, newNumber, setPersons, setNewName, setNewNumber); 
   }
 
-  const doesExist = () => {
-    for ( let i= 0; i < persons.length; i++){
-      if (JSON.stringify(persons[i].name) === (JSON.stringify(newName))){
-        return true;
-      }
-    }
-    return false;
-  }
-
-
-  const filteredPerson = persons.filter((person) => {
-    return person.name.toLowerCase().includes(newSearchWord.toLowerCase());
-  });
+  
   
   return (
     <div>
       <h2>Phonebook</h2>
-      filter shown with <input value={newSearchWord} onChange={handleInputChangeSearchWord} />
-      <h2>Add a new</h2>
-      {/* collet user input i form */}
-      <form onSubmit={handleSubmit}>
-      {/*input field, the typed value is being saved in newName.  */}
-      name: <input value={newName} onChange={handleInputChangeName} />
-      <br></br>
-      
-      number: <input value={newNumber} onChange={handleInputChangeNumber}/>
-      {/* create a button of typesubmit, wich goes with OnSubmit */}
-      <br></br>
-      <button type="submit">add</button>
-      </form>
-      <h2>Numbers</h2>
+      <p>filter shown with</p>
+      <input value={newSearchWord} onChange={handleInputChangeSearchWord} />
 
-      <ul>
-  {/* Check if there's a search filter and if the filter is applied */}
-  {newSearchWord === '' ? (
-    // If no filter is applied, display all persons
-    persons.map(person => (
-      <li key={person.id}>{person.name} {person.number}</li>
-    ))
-  ) : (
-    // If a filter is applied, display filtered persons only
-    filteredPerson.map(person => (
-      <li key={person.id}>{person.name} {person.number}</li>
-    ))
-  )}
-</ul>
-      </div>
+      <h2>Add a new</h2>
+      <form onSubmit={handleSubmit}>
+        <label>
+          name:
+          <input value={newName} onChange={handleInputChangeName} />
+        </label>
+        <br />
+
+        <label>
+          number:
+          <input value={newNumber} onChange={handleInputChangeNumber}/>
+        </label>
+        <br />
+
+        <button type="submit">add</button>
+      </form>
+
+      <h2>Numbers</h2>
+      <ul>{renderPersons(newSearchWord, persons)}</ul>
+    </div>
   );
 };
 export default App
