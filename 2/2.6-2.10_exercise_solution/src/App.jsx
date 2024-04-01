@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import filterPersons from './components/filterPersons';
 import doesExist from './components/doesExist';
 import addPerson from './components/addPerson';
+import axios from 'axios';
+
 
 const renderPersons = (newSearchWord, persons) => {
   const personsToRender = newSearchWord === '' ? persons : filterPersons(persons, newSearchWord);
@@ -13,13 +15,23 @@ const renderPersons = (newSearchWord, persons) => {
 
 const App = () => {
   // Initialize state variables using the useState hook
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-1234567', id: 1 }
-  ]) 
-
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newSearchWord, setNewSearchWord] = useState('')
+
+  // fetch data from the server
+  useEffect(() => {
+    // send HTTP get request to the server, to retrive information
+    axios.get('http://localhost:3001/persons')
+      // handle promise and the function will be executed when the promise is fulfilled
+      .then(response => {
+        setPersons(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
 
   // Handler called onChange is being called in input text field
   const handleInputChangeName = (event) => {
