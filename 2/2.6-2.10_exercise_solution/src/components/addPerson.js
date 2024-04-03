@@ -9,6 +9,9 @@ const addPerson = (persons, newName, newNumber, setPersons, setNewName, setNewNu
     setPersons(persons.concat(newPerson));  // Sets person to the new array, with the new person at the end
     // clear the input field
     setNewName('');
-    setNewNumber(''); 
-  }
+    setNewNumber('');
+    // Return the newly created person object
+    return newPerson;
+}; 
+  
 export default addPerson;

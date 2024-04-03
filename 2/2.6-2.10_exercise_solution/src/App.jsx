@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import filterPersons from './components/filterPersons';
 import doesExist from './components/doesExist';
 import addPerson from './components/addPerson';
-import axios from 'axios';
+import phonebook from './services/phonebook'
 
 
 const renderPersons = (newSearchWord, persons) => {
@@ -22,16 +22,19 @@ const App = () => {
 
   // fetch data from the server
   useEffect(() => {
-    // send HTTP get request to the server, to retrive information
-    axios.get('http://localhost:3001/persons')
+    // send HTTP get request to the server, to retrieve information
+    phonebook.getAll()
       // handle promise and the function will be executed when the promise is fulfilled
       .then(response => {
         setPersons(response.data);
+        console.log(response.data);
+        console.log(persons);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
       });
   }, []);
+  
 
   // Handler called onChange is being called in input text field
   const handleInputChangeName = (event) => {
@@ -70,7 +73,20 @@ const App = () => {
     setNewNumber('');
     return; // Exit the function early
   }
-    addPerson(persons, newName, newNumber, setPersons, setNewName, setNewNumber); 
+    const newPerson = addPerson(persons, newName, newNumber, setPersons, setNewName, setNewNumber); 
+
+      // Send a POST request to the server to add the new person
+    phonebook.create(newPerson)
+    .then(() => {
+      // After the new person is added, fetch the updated list
+      phonebook.getAll()
+        .then(response => {
+          setPersons(response.data);
+        });
+    })
+    .catch(error => {
+      console.error('Error adding person:', error);
+    });
   }
 
   
