@@ -5,12 +5,15 @@ import addPerson from './components/addPerson';
 import phonebook from './services/phonebook'
 
 
-const renderPersons = (newSearchWord, persons) => {
+const renderPersons = (newSearchWord, persons, deletePerson) => {
   const personsToRender = newSearchWord === '' ? persons : filterPersons(persons, newSearchWord);
   return personsToRender.map((person) => (
-    <li key={person.id}>{person.name} {person.number}</li>
+    <li key={person.id}>{person.name} {person.number}
+    <button onClick={() => deletePerson(person.id)}> delete</button>
+    </li>
   ));
 };
+
 
 
 const App = () => {
@@ -20,21 +23,41 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newSearchWord, setNewSearchWord] = useState('')
 
-  // fetch data from the server
-  useEffect(() => {
-    // send HTTP get request to the server, to retrieve information
-    phonebook.getAll()
-      // handle promise and the function will be executed when the promise is fulfilled
+  const deletePerson = (id) => {
+  console.log("Deleting person with id:", id);
+  
+  if (window.confirm("Do you really want to delete?")) {
+    // Send a DELETE request to the server to delete the person with the specified id
+    phonebook.remove(id)
       .then(response => {
-        setPersons(response.data);
-        console.log(response.data);
-        console.log(persons);
+        console.log("Delete response:", response);
+        // After the person is deleted, fetch the updated list of persons
+        phonebook.getAll()
+          .then(response => {
+            console.log("Fetched persons after delete:", response.data);
+            setPersons(response.data);
+          });
       })
       .catch(error => {
-        console.error('Error fetching data:', error);
+        console.error('Error deleting person:', error);
       });
-  }, []);
-  
+  }
+};
+
+// fetch data from the server
+useEffect(() => {
+  // send HTTP get request to the server, to retrieve information
+  phonebook.getAll()
+    // handle promise and the function will be executed when the promise is fulfilled
+    .then(response => {
+      console.log("Fetched persons:", response.data);
+      setPersons(response.data);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+}, []);
+
 
   // Handler called onChange is being called in input text field
   const handleInputChangeName = (event) => {
@@ -60,34 +83,28 @@ const App = () => {
     setNewSearchWord(event.target.value)
   }
 
-  // Event handler when the onSubmit is being clicked. 
   const handleSubmit = (event) => {
-    // Prevent the default form submission behavior, which would cause a page reload
     event.preventDefault(); 
-    
+  
     if (doesExist(persons, newName)){
-      // Name already exists, handle accordingly and show error message
       window.alert(`${newName} is already added to phonebook`);
-    // Reset the input field
-    setNewName('');
-    setNewNumber('');
-    return; // Exit the function early
-  }
+      setNewName('');
+      setNewNumber('');
+      return;
+    }
+  
     const newPerson = addPerson(persons, newName, newNumber, setPersons, setNewName, setNewNumber); 
-
-      // Send a POST request to the server to add the new person
+  
     phonebook.create(newPerson)
-    .then(() => {
-      // After the new person is added, fetch the updated list
-      phonebook.getAll()
-        .then(response => {
-          setPersons(response.data);
-        });
+    .then(response => {
+      // Add the new person directly to the local state
+      setPersons([...persons, response.data]);
     })
     .catch(error => {
       console.error('Error adding person:', error);
     });
   }
+  
 
   
   
@@ -115,7 +132,8 @@ const App = () => {
       </form>
 
       <h2>Numbers</h2>
-      <ul>{renderPersons(newSearchWord, persons)}</ul>
+      <ul>{renderPersons(newSearchWord, persons, deletePerson
+        )}</ul>
     </div>
   );
 };

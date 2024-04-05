@@ -1,17 +1,20 @@
 import { useState } from 'react'
 const addPerson = (persons, newName, newNumber, setPersons, setNewName, setNewNumber) => {
-    // create number for id, 1 is hardcodede so we start at 2, the id increases as the length of the array increases
-    let i = persons.length +1
-    // If the name doesn't exist, proceed to add it
-    // Create a new person, on the same format as the persons in the hook, by adding name and number
-    const newPerson = {name: newName, number: newNumber, id: i}
-    // Sets person to the new array, with the new person at the end
-    setPersons(persons.concat(newPerson));  // Sets person to the new array, with the new person at the end
-    // clear the input field
+    // Generate a unique id for the new person
+    const id = JSON.stringify(Date.now());
+  
+    // Create a new person
+    const newPerson = {name: newName, number: newNumber, id: id};
+  
+    // Add the new person to the persons array
+    setPersons(persons.concat(newPerson));
+  
+    // Clear the input fields
     setNewName('');
     setNewNumber('');
+  
     // Return the newly created person object
     return newPerson;
-}; 
-  
-export default addPerson;
+  };
+
+  export default addPerson;

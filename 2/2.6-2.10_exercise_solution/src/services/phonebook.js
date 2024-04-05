@@ -12,5 +12,15 @@ const create = newEntry => {
   return axios.post(baseUrl, newEntry);
 };
 
+// Function to delete person from phonebook
+const remove = (id) => {
+    return axios.delete(`${baseUrl}/${id}`);
+};
 
-export default { getAll, create};
+// Function to update an existing phonebook entry on the server
+const update = (id, updatedEntry) => {
+    return axios.put(`${baseUrl}/${id}`, updatedEntry);
+};
+  
+
+export default { getAll, create, remove, update};
