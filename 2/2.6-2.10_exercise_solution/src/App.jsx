@@ -84,26 +84,33 @@ useEffect(() => {
   }
 
   const handleSubmit = (event) => {
-    event.preventDefault(); 
-  
-    if (doesExist(persons, newName)){
-      window.alert(`${newName} is already added to phonebook`);
-      setNewName('');
-      setNewNumber('');
-      return;
+    event.preventDefault();
+
+    const existingPerson = persons.find(person => person.name === newName);
+
+    if (existingPerson) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const updatedPerson = { ...existingPerson, number: newNumber };
+        phonebook.update(existingPerson.id, updatedPerson)
+          .then(response => {
+            setPersons(persons.map(person => person.id !== existingPerson.id ? person : response.data));
+            setNewName('');
+            setNewNumber('');
+          });
+      }
+    } else {
+      const newPerson = addPerson(persons, newName, newNumber, setPersons, setNewName, setNewNumber); 
+
+      phonebook.create(newPerson)
+        .then(response => {
+          // Add the new person directly to the local state
+          setPersons([...persons, response.data]);
+        })
+        .catch(error => {
+          console.error('Error adding person:', error);
+        });
     }
-  
-    const newPerson = addPerson(persons, newName, newNumber, setPersons, setNewName, setNewNumber); 
-  
-    phonebook.create(newPerson)
-    .then(response => {
-      // Add the new person directly to the local state
-      setPersons([...persons, response.data]);
-    })
-    .catch(error => {
-      console.error('Error adding person:', error);
-    });
-  }
+  };
   
 
   
