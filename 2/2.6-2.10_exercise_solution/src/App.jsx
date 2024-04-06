@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import filterPersons from './components/filterPersons';
-import doesExist from './components/doesExist';
 import addPerson from './components/addPerson';
-import phonebook from './services/phonebook'
-
+import phonebook from './services/phonebook';
+import Notification from './components/Notification';
 
 const renderPersons = (newSearchWord, persons, deletePerson) => {
   const personsToRender = newSearchWord === '' ? persons : filterPersons(persons, newSearchWord);
@@ -15,13 +14,14 @@ const renderPersons = (newSearchWord, persons, deletePerson) => {
 };
 
 
-
 const App = () => {
   // Initialize state variables using the useState hook
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newSearchWord, setNewSearchWord] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
+  
 
   const deletePerson = (id) => {
   console.log("Deleting person with id:", id);
@@ -82,7 +82,6 @@ useEffect(() => {
     // Update newName to the text within the textfield of input. newName can then be used in handle submit 
     setNewSearchWord(event.target.value)
   }
-
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -96,7 +95,13 @@ useEffect(() => {
             setPersons(persons.map(person => person.id !== existingPerson.id ? person : response.data));
             setNewName('');
             setNewNumber('');
-          });
+            setErrorMessage(
+              `Changed number for '${newName}' to '${newNumber}'`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000) 
+            });
       }
     } else {
       const newPerson = addPerson(persons, newName, newNumber, setPersons, setNewName, setNewNumber); 
@@ -105,22 +110,26 @@ useEffect(() => {
         .then(response => {
           // Add the new person directly to the local state
           setPersons([...persons, response.data]);
+          setErrorMessage(
+            `A new person is added to the phonebook with name'${newName}' and number '${newNumber}'`
+          )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
         })
         .catch(error => {
           console.error('Error adding person:', error);
         });
     }
   };
-  
 
-  
-  
   return (
     <div>
+      <Notification message={errorMessage} />
       <h2>Phonebook</h2>
       <p>filter shown with</p>
       <input value={newSearchWord} onChange={handleInputChangeSearchWord} />
-
+  
       <h2>Add a new</h2>
       <form onSubmit={handleSubmit}>
         <label>
@@ -139,10 +148,10 @@ useEffect(() => {
       </form>
 
       <h2>Numbers</h2>
-      <ul>{renderPersons(newSearchWord, persons, deletePerson
-        )}</ul>
+      <ul>
+        {renderPersons(newSearchWord, persons, deletePerson)}
+      </ul>
     </div>
   );
 };
-export default App
-
+export default App;
