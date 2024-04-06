@@ -20,10 +20,9 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newSearchWord, setNewSearchWord] = useState('')
-  const [errorMessage, setErrorMessage] = useState(null)
-  
+  const [notification, setNotification] = useState({message: null, type: 'success'})
 
-  const deletePerson = (id) => {
+const deletePerson = (id) => {
   console.log("Deleting person with id:", id);
   
   if (window.confirm("Do you really want to delete?")) {
@@ -36,27 +35,42 @@ const App = () => {
           .then(response => {
             console.log("Fetched persons after delete:", response.data);
             setPersons(response.data);
+            setNotification({
+              message: `Information has succesfully been removed from the server`,
+              type: 'success'
+            });
+            setTimeout(() => {
+              setNotification({message: null, type: 'success'});
+            }, 5000);
           });
       })
       .catch(error => {
         console.error('Error deleting person:', error);
+        setNotification({
+          message: `Information of the person has already been removed from the server`,
+          type: 'error'
+        });
+        setTimeout(() => {
+          setNotification({message: null, type: 'success'});
+        }, 5000);
       });
   }
 };
 
+
 // fetch data from the server
-useEffect(() => {
-  // send HTTP get request to the server, to retrieve information
-  phonebook.getAll()
-    // handle promise and the function will be executed when the promise is fulfilled
-    .then(response => {
-      console.log("Fetched persons:", response.data);
-      setPersons(response.data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-}, []);
+  useEffect(() => {
+    // send HTTP get request to the server, to retrieve information
+    phonebook.getAll()
+      // handle promise and the function will be executed when the promise is fulfilled
+      .then(response => {
+        console.log("Fetched persons:", response.data);
+        setPersons(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
 
 
   // Handler called onChange is being called in input text field
@@ -84,9 +98,9 @@ useEffect(() => {
   }
   const handleSubmit = (event) => {
     event.preventDefault();
-
+  
     const existingPerson = persons.find(person => person.name === newName);
-
+  
     if (existingPerson) {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         const updatedPerson = { ...existingPerson, number: newNumber };
@@ -95,37 +109,46 @@ useEffect(() => {
             setPersons(persons.map(person => person.id !== existingPerson.id ? person : response.data));
             setNewName('');
             setNewNumber('');
-            setErrorMessage(
-              `Changed number for '${newName}' to '${newNumber}'`
-            )
-            setTimeout(() => {
-              setErrorMessage(null)
-            }, 5000) 
+            setNotification({
+              message: `Changed number for '${newName}' to '${newNumber}'`,
+              type: 'success'
             });
+            setTimeout(() => {
+              setNotification({message: null, type: 'success'});
+            }, 5000);
+          });
       }
     } else {
       const newPerson = addPerson(persons, newName, newNumber, setPersons, setNewName, setNewNumber); 
-
+  
       phonebook.create(newPerson)
         .then(response => {
           // Add the new person directly to the local state
           setPersons([...persons, response.data]);
-          setErrorMessage(
-            `A new person is added to the phonebook with name'${newName}' and number '${newNumber}'`
-          )
+          setNotification({
+            message: `A new person is added to the phonebook with name '${newName}' and number '${newNumber}'`,
+            type: 'success'
+          });
           setTimeout(() => {
-            setErrorMessage(null)
-          }, 5000)
+            setNotification({message: null, type: 'success'});
+          }, 5000);
         })
         .catch(error => {
           console.error('Error adding person:', error);
+          setNotification({
+            message: `Information of the person has already been removed from the server`,
+            type: 'error'
+          });
+          setTimeout(() => {
+            setNotification({message: null, type: 'success'});
+          }, 5000);
         });
     }
   };
 
   return (
     <div>
-      <Notification message={errorMessage} />
+      <Notification notification={notification}/>
       <h2>Phonebook</h2>
       <p>filter shown with</p>
       <input value={newSearchWord} onChange={handleInputChangeSearchWord} />
