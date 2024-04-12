@@ -13,7 +13,7 @@ const CountryList = ({filteredCountry, setSelectedCountry}) => (
 
 
 const SingleCountry = ({countryBasicData}) => {
-  if (!countryBasicData || !countryBasicData[0].languages) return null;
+  if (!countryBasicData[0] ) return null;
   console.log('SingleCountry runs')
   return (
     <div>
@@ -29,6 +29,8 @@ const SingleCountry = ({countryBasicData}) => {
             )}
           </ul>
           <img src={countryData.flag} alt={`Flag of ${countryData.capital}`} />
+          <h3>Weather in {countryData.capital}</h3>
+          <p>{countryData.weatherData}</p>
         </div>
       ))}
     </div>

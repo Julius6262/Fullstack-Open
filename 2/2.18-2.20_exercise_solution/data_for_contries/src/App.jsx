@@ -11,7 +11,8 @@ function App() {
   const [countryName, setCountryName] = useState(null)
   const [filteredCountry, setFilteredCountry] = useState(null)
   const [countryBasicData, setCountryBasicData] = useState(null)
-  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedCountry, setSelectedCountry] = useState(null)
+  const [countryExtenedData, setCountryExtenedData] = useState(null)
 
   
 
@@ -71,10 +72,31 @@ function App() {
     }
   }, [filteredCountry]);
   
-    
-  useEffect(()=>{
-    console.log(countryBasicData)
-  }, [countryBasicData])
+    // im using another webpage, because i dont want to give my creditcard information away.
+    // it is no possible to get a picture of the weather without having acces issue due to server security. 
+  useEffect(() => {
+    if (countryBasicData) {
+      const promises = countryBasicData.map(country => {
+        return axios.get(`https://wttr.in/${country.capital}?format=%C+%t+%w&lang=en`)
+          .then(response => {
+            return {...country, weatherData: response.data};
+          })
+          .catch(error => {
+            console.log('An error occurred while fetching the weather data:', error);
+          });
+      });
+  
+      Promise.all(promises)
+        .then(newCountryData => {
+          setCountryExtenedData(newCountryData);
+        })
+        .catch(error => {
+          console.log('An error occurred:', error);
+        });
+    }
+  }, [countryBasicData]);
+  
+  
 
   return(
     // Some JSX
@@ -85,7 +107,7 @@ function App() {
       <div>
         <DisplayCountry 
         filteredCountry={filteredCountry} 
-        countryBasicData={countryBasicData}
+        countryBasicData={countryExtenedData}
         selectedCountry={selectedCountry}
         setSelectedCountry={setSelectedCountry}/>
       </div>
