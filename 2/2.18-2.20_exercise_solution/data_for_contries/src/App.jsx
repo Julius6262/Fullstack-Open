@@ -11,6 +11,8 @@ function App() {
   const [countryName, setCountryName] = useState(null)
   const [filteredCountry, setFilteredCountry] = useState(null)
   const [countryBasicData, setCountryBasicData] = useState(null)
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
   
 
   // fetch data from the API and save the names as and array in countryName
@@ -38,40 +40,54 @@ function App() {
     }
     
     
-  }, [newSearchWord, countryName])
+  }, [countryName])
 
   const handleInputChangeSearchWord = (event) =>{
     setNewSearchWord(event.target.value) 
   }
 
   useEffect(() => {
-    if (filteredCountry && filteredCountry.length === 1){
-      axios
-      .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${filteredCountry[0]}`)
-      .then(response => {
-        const countryinfo = response.data;
-        const data = {
-          capital: countryinfo.capital[0],
-          area: countryinfo.area,
-          flag: countryinfo.flags.png,
-          languages: Object.values(countryinfo.languages)
-        };
-          setCountryBasicData(data)
-      })
-      .catch(error => {
-        console.log('fail to get the specifik country data')
-      })
+    if (filteredCountry){
+      const promises = filteredCountry.map(country => {
+        return axios
+          .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${country}`)
+          .then(response => {
+            const countryinfo = response.data;
+            return {
+              name: countryinfo.name.common,
+              capital: countryinfo.capital[0],
+              area: countryinfo.area,
+              flag: countryinfo.flags.png,
+              languages: Object.values(countryinfo.languages)
+            };
+          })
+      });
+  
+      Promise.all(promises)
+        .then(data => setCountryBasicData(data))
+        .catch(error => {
+          console.log('fail to get the specific country data')
+        });
     }
-  }), [filteredCountry]
+  }, [filteredCountry]);
+  
     
+  useEffect(()=>{
+    console.log(countryBasicData)
+  }, [countryBasicData])
 
   return(
     // Some JSX
     <div>
+      <h2>Search for information about a country</h2>
       <span>find countries </span>
       <input value={newSearchWord || ''} onChange={handleInputChangeSearchWord}></input>
       <div>
-        <DisplayCountry filteredCountry={filteredCountry} countryBasicData={countryBasicData}/>
+        <DisplayCountry 
+        filteredCountry={filteredCountry} 
+        countryBasicData={countryBasicData}
+        selectedCountry={selectedCountry}
+        setSelectedCountry={setSelectedCountry}/>
       </div>
     </div>
   )

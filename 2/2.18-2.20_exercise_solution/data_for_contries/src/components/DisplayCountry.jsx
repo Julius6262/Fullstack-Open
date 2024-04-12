@@ -1,42 +1,58 @@
 import React from 'react';
 
-const CountryList = ({filteredCountry, countryBasicData}) => (
-  <ul>
+const CountryList = ({filteredCountry, setSelectedCountry}) => (
+  <div>
     {filteredCountry.map(country => 
-      <span key={country}> {country} <br></br></span>
+      <div key={country}>
+        <span>{country.charAt(0).toUpperCase() + country.slice(1)}</span>
+        <button onClick={() => setSelectedCountry(country)}>show</button>
+      </div>
     )}
-  </ul>
+  </div>
 );
 
-const SingleCountry = ({countryBasicData, filteredCountry}) => {
-  if (!countryBasicData) return null;
 
+const SingleCountry = ({countryBasicData}) => {
+  if (!countryBasicData || !countryBasicData[0].languages) return null;
+  console.log('SingleCountry runs')
   return (
     <div>
-      <h2>{filteredCountry}</h2>
-      <p>capital: {countryBasicData.capital}</p>
-      <p>Area: {countryBasicData.area} sq km</p>
-      <p>Languages: </p>
-      <ul>
-      {countryBasicData.languages.map((langues)=>
-      <li key={langues}> {langues} </li>
-      )}
-      </ul>
-      <img src={countryBasicData.flag} alt={`Flag of ${countryBasicData.capital}`} />
+      {countryBasicData.map((countryData, index) => (
+        <div key={index}>
+          <h2>{countryData.name.charAt(0).toUpperCase() + countryData.name.slice(1)}</h2>
+          <p>capital: {countryData.capital}</p>
+          <p>Area: {countryData.area} sq km</p>
+          <p>Languages: </p>
+          <ul>
+            {countryData.languages.map((language)=>
+              <li key={language}> {language} </li>
+            )}
+          </ul>
+          <img src={countryData.flag} alt={`Flag of ${countryData.capital}`} />
+        </div>
+      ))}
     </div>
   );
 };
+
+
+
 
 const ManyCountries = () => <p>Input more letters to show countries.</p>;
 
 const NoCountries = () => <p>No countries found.</p>;
 
-const DisplayCountry = ({filteredCountry, countryBasicData}) => {
+const DisplayCountry = ({filteredCountry, countryBasicData, selectedCountry, setSelectedCountry}) => {
   if (filteredCountry) {
     if(filteredCountry.length > 1 && filteredCountry.length <= 10){
-      return <CountryList filteredCountry={filteredCountry} />;
+      return (
+        <div>
+          <CountryList filteredCountry={filteredCountry} setSelectedCountry={setSelectedCountry} />
+          {selectedCountry && <SingleCountry countryBasicData={countryBasicData.filter(country => country.name.toLowerCase() === selectedCountry)} />}
+        </div>
+      );
     } else if(filteredCountry.length === 1){
-      return <SingleCountry countryBasicData={countryBasicData} filteredCountry= {filteredCountry}/>;
+      return <SingleCountry countryBasicData={countryBasicData} />;
     } else if(filteredCountry.length > 10){
       return <ManyCountries />;
     } else {
@@ -45,4 +61,5 @@ const DisplayCountry = ({filteredCountry, countryBasicData}) => {
   }
   return null;
 };
+
 export default DisplayCountry;
